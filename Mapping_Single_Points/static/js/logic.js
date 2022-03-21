@@ -10,6 +10,20 @@ console.log("working");
 // We set the zoom level of "4" on a scale 0–18.
 let map = L.map('mapid').setView([40.7,-94.5], 4);
 
+//  Add a marker to the map for Los Angeles, California.
+// This is the traditional marker
+// let marker = L.marker([34.0522, -118.2437]).addTo(map);
+
+//This uses a circle for the marker.
+// L.circle([34.0522, -118.2437], {radius: 300, color: "black", fillColor: "#ffffe0", fillOpacity: .8, weight: 1}).addTo(map);
+
+ 
+//This uses  circlemarker method for the marker.
+//Uses pixel radius instead of meters
+L.circleMarker([34.0522, -118.2437], {radius: 30, color: "black", fillColor: "#ffffa1", fillOpacity: .8, weight: 1}).addTo(map);
+
+
+
 // Alternative for when multiple tile layers required
 // // Create the map object with a center and zoom level.
 // let map = L.map("mapid", {
@@ -39,7 +53,7 @@ let map = L.map('mapid').setView([40.7,-94.5], 4);
 
 
 // We create the tile layer that will be the background of our map.
-let streets = L.tileLayer('https://api.mapbox.com/styles/v1/mapbox/streets-v11/tiles/{z}/{x}/{y}?access_token={accessToken}', {
+let streets = L.tileLayer('https://api.mapbox.com/styles/v1/mapbox/dark-v10/tiles/{z}/{x}/{y}?access_token={accessToken}', {
 attribution: 'Map data © <a href="https://www.openstreetmap.org/">OpenStreetMap</a> contributors, <a href="https://creativecommons.org/licenses/by-sa/2.0/">CC-BY-SA</a>, Imagery (c) <a href="https://www.mapbox.com/">Mapbox</a>',
     maxZoom: 18,
     accessToken: API_KEY
