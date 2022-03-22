@@ -1,6 +1,9 @@
 // Add console.log to check to see if our code is working.
 console.log("working");
 
+// Get data from cities.js
+let cityData = cities;
+
 // Create the map object with a center and zoom level.
 // We're assigning the variable map to the object L.map(), and we'll instantiate 
 // the object with the given string 'mapid'.
@@ -10,19 +13,34 @@ console.log("working");
 // We set the zoom level of "4" on a scale 0–18.
 let map = L.map('mapid').setView([40.7,-94.5], 4);
 
-//  Add a marker to the map for Los Angeles, California.
-// This is the traditional marker
-// let marker = L.marker([34.0522, -118.2437]).addTo(map);
-
-//This uses a circle for the marker.
-// L.circle([34.0522, -118.2437], {radius: 300, color: "black", fillColor: "#ffffe0", fillOpacity: .8, weight: 1}).addTo(map);
-
- 
-//This uses  circlemarker method for the marker.
-//Uses pixel radius instead of meters
-L.circleMarker([34.0522, -118.2437], {radius: 30, color: "black", fillColor: "#ffffa1", fillOpacity: .8, weight: 1}).addTo(map);
 
 
+// Loop through the cities array and create one marker for each city.
+
+cityData.forEach(function(city) {
+    console.log(city);
+    L.circleMarker(
+        city.location, 
+        {radius: ((city.population-200000)/100000),
+         fillColor: 'orange',
+         weight: 4,
+         })
+        .bindPopup("<h2>" + city.city + ", " + city.state + "</h2> <hr> <h3>Population " + city.population.toLocaleString() + "</h3>")
+  .addTo(map);
+});
+
+
+// BASIC MARKER EXAMPLE
+// cityData.forEach(function(city) {
+//     L.marker(city.location).addTo(map);
+// });
+
+// MARKER WITH POPUP EXAMPLE
+// cityData.forEach(function(city) {
+//     console.log(city);
+//     L.marker(city.location).bindPopup("<h2>" + city.city + ", " + city.state + "</h2> <hr> <h3>Population " + city.population.toLocaleString() + "</h3>")
+//   .addTo(map);
+// });
 
 // Alternative for when multiple tile layers required
 // // Create the map object with a center and zoom level.
@@ -58,6 +76,9 @@ attribution: 'Map data © <a href="https://www.openstreetmap.org/">OpenStreetMap
     maxZoom: 18,
     accessToken: API_KEY
 });
+
+
+
 
 // Then we add our 'graymap' tile layer to the map.
 streets.addTo(map);
