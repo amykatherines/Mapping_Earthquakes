@@ -1,7 +1,3 @@
-// Add console.log to check to see if our code is working.
-console.log("working");
-
-
 // Create the map object with a center and zoom level.
 // We're assigning the variable map to the object L.map(), and we'll instantiate 
 // the object with the given string 'mapid'.
@@ -10,88 +6,81 @@ console.log("working");
 // where the first coordinate is latitude (40.7) and the second is longitude (-94.5). 
 // We set the zoom level of "5" on a scale 0–18.
 
-// Create the map object with center at the San Francisco airport.
-let map = L.map('mapid').setView([37.5, -122.5], 10);
-
-// Add GeoJSON data.
-let sanFranAirport =
-{"type":"FeatureCollection","features":[{
-    "type":"Feature",
-    "properties":{
-        "id":"3469",
-        "name":"San Francisco International Airport",
-        "city":"San Francisco",
-        "country":"United States",
-        "faa":"SFO",
-        "icao":"KSFO",
-        "alt":"13",
-        "tz-offset":"-8",
-        "dst":"A",
-        "tz":"America/Los_Angeles"},
-        "geometry":{
-            "type":"Point",
-            "coordinates":[-122.375,37.61899948120117]}}
-]};
-
-
-//GeoJSON objects are added to the map through a GeoJSON layer, L.geoJSON(). In "The GeoJSON Layer" section, it says to 
-// create the GeoJSON layer and add it to our map.
-// Grabbing our GeoJSON data.
-L.geoJSON(sanFranAirport).addTo(map);
-
-
-// We add two arguments: the data and the pointToLayer callback function.
-// The data will be our sanFranAirport data.
-// For the pointToLayer callback function, we are first going to call a function() where we pass
-// each GeoJSON feature as feature, and its latitude and longitude as latlng.
-// Then we add a marker for each feature with a latitude and longitude in the pointToLayer 
-// callback function argument by using return L.marker(latlng).
-// Grabbing our GeoJSON data.
-// Using the dot notation, we can traverse through the JSON object to get the city by using feature.properties.city. 
-
-// // ****GOOD EXAMPLE****
-// L.geoJSON(sanFranAirport, {
-//   // We turn each feature into a marker on the map.
-//   pointToLayer: function(feature, latlng) {
-//     return L.marker(latlng).bindPopup("<h2>"+ feature.properties.name + "</h2><hr><h3>" + feature.properties.city + ", " + feature.properties.country + "</h3>");
-//   }
-// }).addTo(map);
-
-// Let's break down what is happening in the L.geoJSON() layer:
-// First, we add two arguments: the data and the onEachFeature callback function.
-// The data will be our sanFranAirport data.
-// With the onEachFeature callback function we are first going to call an anonymous function, 
-// function(), where we pass each GeoJSON feature as feature, and any properties to the second argument, layer.
-L.geoJSON(sanFranAirport, {
-  onEachFeature: function(feature, layer) {
-    layer.bindPopup("<h2>Aiport Code:") // " + layer.feature.faa + "</h2><hr><h3>Airport Name: " + layer.feature.name + "</h3>");
-   }
-});
-
-
-//  DIDN'T GET the onEachFeture WORKING ***********
-  // // Give each feature a popup describing the place and time of the earthquake
-  // function onEachFeature(features, layer) {
-  //   layer.bindPopup("<h2>" + features.properties.Name 
-  //   + "</h2><hr><h3>Neighborhood ID: " + features.properties.Neighborhood_ID + "</h3>");
-  // }
-
-
-// L.geoJSON(sanFranAirport, {
-//   onEachFeature: function(features, layer) {
-//     layer.bindPopup("<h2>" + features.properties.faa  + "</h2>");
-//    }
-//  });
-
+// Create the map object with center and zoom level. 
+// We won't use this for the multi layer map
+//let map = L.map('mapid').setView([30, 30], 2);
 
 
 // We create the tile layer that will be the background of our map.
-let streets = L.tileLayer('https://api.mapbox.com/styles/v1/mapbox/outdoors-v11/tiles/{z}/{x}/{y}?access_token={accessToken}', {
+let streets = L.tileLayer('https://api.mapbox.com/styles/v1/mapbox/streets-v11/tiles/{z}/{x}/{y}?access_token={accessToken}', {
 attribution: 'Map data © <a href="https://www.openstreetmap.org/">OpenStreetMap</a> contributors, <a href="https://creativecommons.org/licenses/by-sa/2.0/">CC-BY-SA</a>, Imagery (c) <a href="https://www.mapbox.com/">Mapbox</a>',
     maxZoom: 18,
     accessToken: API_KEY
 });
 
-// Then we add our tile layer to the map.
-streets.addTo(map);
+// We create the dark view tile layer that will be an option for our map.
+let dark = L.tileLayer('https://api.mapbox.com/styles/v1/mapbox/dark-v10/tiles/{z}/{x}/{y}?access_token={accessToken}', {
+attribution: 'Map data © <a href="https://www.openstreetmap.org/">OpenStreetMap</a> contributors, <a href="https://creativecommons.org/licenses/by-sa/2.0/">CC-BY-SA</a>, Imagery (c) <a href="https://www.mapbox.com/">Mapbox</a>',
+    maxZoom: 18,
+    accessToken: API_KEY
+});
+
+// Create a base layer that holds both maps.
+// the Street and Dark keys set the text, which we'll see in the index.html file, while the corresponding values reference the tile layers. Street and Dark can be used 
+// to toggle between styles in the index.html file
+let baseMaps = {
+  Street: streets,
+  Dark: dark
+};
+
+// // Having the tileLayer() method before accessing large datasets ensures that the map gets loaded before the data is added to it.
+// // Then we add our tile layer to the map.
+// streets.addTo(map);
+
+// Create the map object with center, zoom level and default layer.
+let map = L.map('mapid', {
+  center: [30, 30],
+  zoom: 2,
+  layers: [streets]
+})
+
+// Pass our map layers into our layers control and add the layers control to the map.
+// When creating the Layers Control, the argument passed, baseMaps, is the 
+// base layer object, which will allow the two different map styles to be shown on the index.html file. 
+//The Layers Control will look like the following before it is clicked to show the 
+// Street and Dark options:
+L.control.layers(baseMaps).addTo(map);
+
+// Accessing the airport GeoJSON URL
+let airportData = "https://raw.githubusercontent.com/amykatherines/Mapping_Earthquakes/main/Mapping_GeoJSON_Points/static/data/majorAirports.json";
+
+
+//add the d3.json() method, which returns a promise with the then() method and the anonymous function().
+// Inside the d3.json() method we'll add the airportData variable.
+// Inside the anonymous function() we'll add the data parameter, which references the airportData.
+// We'll pass this data to the L.geoJSON() layer and then it'll be added to the map with addTo(map).
+// Grabbing our GeoJSON data.
+d3.json(airportData).then(function(data) {
+  console.log(data);
+  L.geoJson(data, {
+      onEachFeature: function(features, layer){
+        layer.bindPopup("<h3>Airport Code: " + features.properties.faa + "</h3> <hr> <h4>Airport Name: " 
+        + features.properties.name + "</h4>")
+      }
+    }).addTo(map);
+});
+
+// // Creating a GeoJSON layer with the retrieved data.
+// //Basic Example
+// // L.geoJSON(data).addTo(map);
+
+
+// //with pup up data
+// L.geoJSON(data, {
+//   onEachFeature: function(features, layer){
+//     layer.bindPopup("<h3>Airport Code: " + features.properties.faa + "</h3> <hr> <h4>Airport Name: " 
+//     + features.properties.name + "</h4>")
+//   }
+// }).addTo(map);
+// });
 
